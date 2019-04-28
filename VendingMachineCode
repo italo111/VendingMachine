@@ -1,0 +1,153 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+entity harware is
+port( clk : in STD_LOGIC;
+start: in STD_LOGIC;
+coin1, coin2, coin3 : in STD_LOGIC;
+reset : in STD_LOGIC;
+back : in STD_LOGIC;
+selector : in STD_LOGIC_VECTOR (2 downto 0);
+dispensor: out STD_LOGIC_vector (3 downto 0);
+en1: out STD_LOGIC; 
+display1 : out STD_LOGIC_VECTOR (7 downto 0)
+) ;
+end harware ;
+
+architecture Behavioral of harware is
+type statetype is (s0,s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12);
+signal pstate,nstate : statetype;
+begin
+en1 <= '0';
+synchronous_process: process(clk)
+begin
+
+if rising_edge (clk) then
+if(reset = '0' ) then
+ pstate <= s0;
+ else
+ pstate <= nstate;
+ end if;
+ end if;
+ end process;
+ Output_decoder: process (pstate, start, coin1, coin2, coin3, back, selector)
+ begin
+ nstate <= s0;
+ case(pstate) is 
+ when s0 =>
+if(start = '0') then nstate <= s1;
+elsif(start = '1') then nstate <= s0;
+end if; 
+when s1 =>
+if(selector = "011") then nstate <= s2;
+elsif(selector = "010") then nstate <= s3;
+elsif(selector = "001") then nstate <= s4;
+elsif(selector = "000") then nstate <= s5;
+end if;
+when s2 =>
+if(coin1 = '0') then nstate <= s6;
+else
+nstate <= s2;
+end if;
+when S6 =>
+if(back = '0') then nstate <= s0;
+else
+nstate <= s6;
+end if;
+when s3 =>
+if(coin1 = '0') then nstate <= s7;
+else
+nstate <= s3;
+end if;
+when s7 =>
+if(coin2 = '0') then nstate <= s8;
+else
+nstate <= s7;
+end if;
+when s8 =>
+if(back = '0') then nstate <= s0;
+else
+nstate <= s8;
+end if;
+when  s4 =>
+if(coin1 = '0') then nstate <= s9;
+else
+nstate <= s4;
+end if;
+when s9 =>
+if(coin2 = '0') then nstate <= s10;
+else
+nstate <= s9;
+end if;
+when s10 =>
+if(coin3 = '0') then nstate <= s11;
+else
+nstate <= s10;
+end if;
+when s11 =>
+if(back = '0') then nstate <= s0;
+else
+nstate <= s11;
+end if;
+when s5 =>
+if(coin1 = '0') then nstate <= s12;
+else
+nstate <= s5;
+end if;
+when s12 =>
+if(back = '0') then nstate <= s0;
+else
+nstate <= s12;
+end if;
+when others =>
+nstate <= s0;
+end case;
+end process;
+next_state: process(pstate)
+begin
+case (pstate) is
+when s0 =>
+dispensor <= "0000";
+display1 <= "11000000";
+when s1 =>
+dispensor <= "0000";
+display1 <= "11000000";
+when s2 =>
+dispensor <= "0000";
+display1 <= "11000000";
+when s3 =>
+dispensor <= "0000";
+display1 <= "11000000";
+when s4 =>
+dispensor <= "0000";
+display1 <= "11000000";
+when s5 =>
+dispensor <= "0000";
+display1 <= "11000000";
+when s7 =>
+dispensor <= "0000";
+display1 <= "11111001";
+when s9 =>
+dispensor <= "0000";
+display1 <= "11111001";
+when s10 =>
+dispensor <= "0000";
+display1 <= "10100100";
+when s6 =>
+dispensor <= "0001";
+display1 <= "11111001";
+when s8 =>
+dispensor <= "0010";
+display1 <= "10100100";
+when s11 =>
+dispensor <= "0100";
+display1 <= "10110000";
+when s12 =>
+dispensor <= "1000";
+display1 <= "11111001";
+when others =>
+dispensor <= "0000";
+display1 <= "11000000";
+end case;
+end process;
+end Behavioral;
+
